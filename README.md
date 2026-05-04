@@ -111,4 +111,4 @@ MIT — do whatever you want with it. Just don't blame me if it eats your messag
 
 ---
 
-**Built with ❤️ by [wizzleweasel](https://github.com/wizzleweasel) tested on the Hermes Ecosystem.**
+**Built with ❤️ by [wizzleweasel](https://github.com/wizzleweasel) as part of our development journey.**
