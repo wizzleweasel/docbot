@@ -158,11 +158,13 @@ def send_file_via_http(chat_id, filepath, caption):
     """Send file using direct HTTP API (more reliable than library)."""
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
     with open(filepath, 'rb') as f:
-        files_param = {'document': f}
+        # Use tuple (filename, file_object, mime_type) to preserve original filename
+        files_param = {'document': (filepath.name, f, 'text/plain')}
         data = {'chat_id': chat_id, 'caption': caption}
         resp = requests.post(url, files=files_param, data=data)
         if not resp.json().get('ok'):
             print(f"Error sending file: {resp.json().get('description')}")
+    return resp.json().get('ok', False)
 
 def get_or_create_session(message: Message) -> ConversationSession:
     """Get existing session or create new one."""
