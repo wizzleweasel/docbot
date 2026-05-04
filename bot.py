@@ -267,7 +267,7 @@ def handle_get(message: Message):
     
     filepath = files[idx]
     with open(filepath, 'rb') as f:
-        bot.send_document(chat_id, f, caption=f"📄 {filepath.name}")
+        bot.send_document(chat_id, telebot.types.InputFile(f), caption=f"📄 {filepath.name}")
 
 # Main message handler
 @bot.message_handler(func=lambda m: True)
@@ -298,9 +298,9 @@ def handle_message(message: Message):
             del sessions[message.chat.id]
             if filepath:
                 bot.reply_to(message, f"✅ Chunk saved as `{filepath.name}` ({session.message_count} messages)\n\nReady for new messages!")
-                # Send the file directly in chat
+                # Send the file directly in chat - use InputFile
                 with open(filepath, 'rb') as f:
-                    bot.send_document(message.chat.id, f, caption=f"📄 {filepath.name}")
+                    bot.send_document(message.chat.id, telebot.types.InputFile(f), caption=f"📄 {filepath.name}")
         else:
             # Acknowledge receipt (silent success)
             pass
