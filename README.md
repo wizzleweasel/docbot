@@ -84,7 +84,7 @@ Original Date: 2026-05-01T10:00:00
 - ✅ **Saves forwarded messages** as searchable `.txt` files
 - ✅ **Metadata included** — sender, chat, timestamps, forward info
 - ✅ **Open access** — anyone can use it (no chat restrictions)
-- ✅ **AI-agent friendly** — Cumi can `read_file` or `search_files` to recall context
+- ✅ **AI-agent friendly** — Your AI Agent can `read_file` or `search_files` to recall context
 - ✅ **Zero bloat** — no databases, no APIs, just files
 - ✅ **Lightweight** — runs on a potato
 
