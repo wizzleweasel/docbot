@@ -220,6 +220,55 @@ def handle_cancel(message: Message):
     else:
         bot.reply_to(message, "ℹ️ No active session to cancel.")
 
+@bot.message_handler(commands=['list', 'files'])
+def handle_list(message: Message):
+    """List all saved chunks for this user/chat."""
+    chat_id = message.chat.id
+    
+    # Get all chunk files for this chat
+    files = sorted(DOCS_DIR.glob(f"chunk_*_{chat_id}_*.txt"), key=os.path.getmtime, reverse=True)
+    
+    if not files:
+        bot.reply_to(message, "📂 No saved chunks found for this chat.\n\nSend some messages and use `proceed` to save!")
+        return
+    
+    # Build list (show last 10)
+    lines = ["📄 **Saved chunks:**", ""]
+    for i, f in enumerate(files[:10]):
+        size_kb = f.stat().st_size / 1024
+        lines.append(f"{i+1}. `{f.name}` ({size_kb:.1f} KB)")
+    
+    if len(files) > 10:
+        lines.append(f"\n...and {len(files) - 10} more")
+    
+    lines.append("\n💡 Send `/get <number>` to download (e.g., `/get 1`)")
+    
+    bot.reply_to(message, "\n".join(lines))
+
+@bot.message_handler(commands=['get'])
+def handle_get(message: Message):
+    """Send a specific chunk file by number from /list."""
+    chat_id = message.chat.id
+    
+    # Parse file number
+    parts = message.text.split()
+    if len(parts) < 2 or not parts[1].isdigit():
+        bot.reply_to(message, "❌ Usage: `/get <number>`\nCheck `/list` for available files.")
+        return
+    
+    idx = int(parts[1]) - 1  # Convert to 0-based
+    
+    # Get files
+    files = sorted(DOCS_DIR.glob(f"chunk_*_{chat_id}_*.txt"), key=os.path.getmtime, reverse=True)
+    
+    if idx < 0 or idx >= len(files):
+        bot.reply_to(message, f"❌ Invalid number. Use `/list` to see available files (1-{len(files)}).")
+        return
+    
+    filepath = files[idx]
+    with open(filepath, 'rb') as f:
+        bot.send_document(chat_id, f, caption=f"📄 {filepath.name}")
+
 # Main message handler
 @bot.message_handler(func=lambda m: True)
 def handle_message(message: Message):
@@ -249,6 +298,9 @@ def handle_message(message: Message):
             del sessions[message.chat.id]
             if filepath:
                 bot.reply_to(message, f"✅ Chunk saved as `{filepath.name}` ({session.message_count} messages)\n\nReady for new messages!")
+                # Send the file directly in chat
+                with open(filepath, 'rb') as f:
+                    bot.send_document(message.chat.id, f, caption=f"📄 {filepath.name}")
         else:
             # Acknowledge receipt (silent success)
             pass
