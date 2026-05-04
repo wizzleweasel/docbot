@@ -28,7 +28,7 @@ Message [@BotFather](https://t.me/BotFather) on Telegram:
 ```
 /newbot
 Name: docbot
-Username: your_docbot_bot
+Username: your_preferred_name_bot
 ```
 Copy the token he gives you.
 
@@ -52,7 +52,7 @@ Bot says: `✅ Connected as @your_docbot_bot`
 ### 4. Use It
 - Forward any message to your bot
 - Bot replies: `✅ Saved as msg_20260503_193000_chat_sender.txt`
-- **Cumi (or any AI agent) can now read that file for context!**
+- **Your OpenClaw / Hermes-Agent / Claude Code (or any AI agent) can now read that file for context!**
 
 ---
 
@@ -111,4 +111,4 @@ MIT — do whatever you want with it. Just don't blame me if it eats your messag
 
 ---
 
-**Built with ❤️ by [wizzleweasel](https://github.com/wizzleweasel) as part of our development journey.**
+**Built with ❤️ by [wizzleweasel](https://github.com/wizzleweasel) tested on Hermes Agent.**
