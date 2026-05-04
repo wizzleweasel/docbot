@@ -5,6 +5,7 @@ for document support and context recall.
 """
 import os
 import json
+import requests
 from datetime import datetime, timedelta
 from pathlib import Path
 import telebot
@@ -153,6 +154,16 @@ class ConversationSession:
         
         return filepath
 
+def send_file_via_http(chat_id, filepath, caption):
+    """Send file using direct HTTP API (more reliable than library)."""
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+    with open(filepath, 'rb') as f:
+        files_param = {'document': f}
+        data = {'chat_id': chat_id, 'caption': caption}
+        resp = requests.post(url, files=files_param, data=data)
+        if not resp.json().get('ok'):
+            print(f"Error sending file: {resp.json().get('description')}")
+
 def get_or_create_session(message: Message) -> ConversationSession:
     """Get existing session or create new one."""
     chat_id = message.chat.id
@@ -194,6 +205,8 @@ def handle_proceed(message: Message):
         del sessions[chat_id]
         if filepath:
             bot.reply_to(message, f"✅ Chunk saved as `{filepath.name}`\n\nReady for new messages!")
+            # Send file directly
+            send_file_via_http(chat_id, filepath, f"📄 {filepath.name}")
         else:
             bot.reply_to(message, "⚠️ No messages to save in this session.")
     else:
@@ -225,23 +238,23 @@ def handle_list(message: Message):
     """List all saved chunks for this user/chat."""
     chat_id = message.chat.id
     
-    # Get all chunk files for this chat
-    files = sorted(DOCS_DIR.glob(f"chunk_*_{chat_id}_*.txt"), key=os.path.getmtime, reverse=True)
+    # Get all chunk files for this chat - oldest first (newest at bottom)
+    files = sorted(DOCS_DIR.glob(f"chunk_*_{chat_id}_*.txt"), key=os.path.getmtime, reverse=False)
     
     if not files:
         bot.reply_to(message, "📂 No saved chunks found for this chat.\n\nSend some messages and use `proceed` to save!")
         return
     
-    # Build list (show last 10)
-    lines = ["📄 **Saved chunks:**", ""]
-    for i, f in enumerate(files[:10]):
+    # Build list (show last 10, which are the newest)
+    lines = ["📄 **Saved chunks:** (oldest → newest)", ""]
+    for i, f in enumerate(files[-10:], start=max(1, len(files)-9)):
         size_kb = f.stat().st_size / 1024
-        lines.append(f"{i+1}. `{f.name}` ({size_kb:.1f} KB)")
+        lines.append(f"{i}. `{f.name}` ({size_kb:.1f} KB)")
     
     if len(files) > 10:
-        lines.append(f"\n...and {len(files) - 10} more")
+        lines.append(f"\n...and {len(files) - 10} older files")
     
-    lines.append("\n💡 Send `/get <number>` to download (e.g., `/get 1`)")
+    lines.append("\n💡 Send `/get <number>` to download (e.g., `/get 1` for oldest)")
     
     bot.reply_to(message, "\n".join(lines))
 
@@ -262,12 +275,12 @@ def handle_get(message: Message):
     files = sorted(DOCS_DIR.glob(f"chunk_*_{chat_id}_*.txt"), key=os.path.getmtime, reverse=True)
     
     if idx < 0 or idx >= len(files):
-        bot.reply_to(message, f"❌ Invalid number. Use `/list` to see available files (1-{len(files)}).")
+        bot.reply_to(message, f"❌ Invalid number. Use `/list` to see available files (1={oldest}, {len(files)}=newest).")
         return
     
     filepath = files[idx]
-    with open(filepath, 'rb') as f:
-        bot.send_document(chat_id, telebot.types.InputFile(f), caption=f"📄 {filepath.name}")
+    # Send file using direct HTTP API
+    send_file_via_http(chat_id, filepath, f"📄 {filepath.name}")
 
 # Main message handler
 @bot.message_handler(func=lambda m: True)
@@ -298,12 +311,8 @@ def handle_message(message: Message):
             del sessions[message.chat.id]
             if filepath:
                 bot.reply_to(message, f"✅ Chunk saved as `{filepath.name}` ({session.message_count} messages)\n\nReady for new messages!")
-                # Send the file directly in chat - use InputFile
-                with open(filepath, 'rb') as f:
-                    bot.send_document(message.chat.id, telebot.types.InputFile(f), caption=f"📄 {filepath.name}")
-        else:
-            # Acknowledge receipt (silent success)
-            pass
+                # Send file directly
+                send_file_via_http(message.chat.id, filepath, f"📄 {filepath.name}")
         
     except Exception as e:
         bot.reply_to(message, f"❌ Error: {str(e)}")
