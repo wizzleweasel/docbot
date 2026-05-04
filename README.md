@@ -60,7 +60,7 @@ Bot says: `✅ Connected as @your_docbot_bot`
 
 ```
 User forwards message → docbot → saves as .txt in /bot-docs/
-                                  └─ Cumi reads file → better context recall
+                                  └─ Your AI Agent reads file → better context recall
 ```
 
 **File format:**
@@ -98,18 +98,6 @@ Original Date: 2026-05-01T10:00:00
 
 ---
 
-## 🤝 Part of the Hermes Ecosystem
-
-docbot is a **simple sidekick** in the Hermes multi-agent ecosystem:
-
-| Agent | Role | Model |
-|-------|------|-------|
-| **Cumi** | Main Hermes Agent (this chat) | tencent/hy3-preview:free |
-| **Pupu** | Nested Hermes Agent | tencent/hy3-preview:free |
-| **Kura** | Discord chatbot | tencent/hy3-preview:free |
-| **docbot** | Document support bot 🆕 | (no AI, just saves files) |
-
----
 
 ## 📜 License
 
@@ -123,4 +111,4 @@ MIT — do whatever you want with it. Just don't blame me if it eats your messag
 
 ---
 
-**Built with ❤️ by [wizzleweasel](https://github.com/wizzleweasel) as part of the Hermes Ecosystem.**
+**Built with ❤️ by [wizzleweasel](https://github.com/wizzleweasel) tested on the Hermes Ecosystem.**
