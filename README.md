@@ -1,18 +1,23 @@
-# docbot 📄
+# 📄 docbot
 
-> *"me save message. you read later. simple."* — docbot
+> *"Ugh. Me save message. You read later. Simple."* — docbot, probably
 
-A minimal Telegram bot that saves forwarded messages as `.txt` files for document support and context recall. No AI, no fancy features — just saves your messages so **cumi** (Hermes Agent) can read them later.
+A **dead-simple Telegram bot** that catches forwarded messages and saves them as `.txt` files for **document support & context recall**. No databases, no APIs, no bloat — just pure file-based memory for your AI agents.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-2CA5E0?logo=telegram)](https://core.telegram.org/bots)
 
 ---
 
-## 🔥 What It Does
+## 🔥 Why docbot?
 
-| Before | After |
-|--------|-------|
-| Messages get lost in Telegram history | Messages saved as searchable `.txt` files |
-| Can't give cumi good context | Point cumi at `bot-docs/` folder |
-| Forwarding = manual copy-paste | Forward → auto-saved with metadata |
+| **Before docbot** | **After docbot** |
+|-------------------|------------------|
+| Forward message, forget context | Forward message, **saved as `.txt`** |
+| AI agent has no long-term memory | AI agent reads files, **remembers everything** |
+| Copy-paste into chat manually | **Automatic document support** |
+| Context gets lost in noise | Clean `.txt` chunks, **searchable & reusable** |
 
 ---
 
@@ -22,39 +27,48 @@ A minimal Telegram bot that saves forwarded messages as `.txt` files for documen
 Message [@BotFather](https://t.me/BotFather) on Telegram:
 ```
 /newbot
-docbot
+Name: docbot
+Username: your_docbot_bot
 ```
 Copy the token he gives you.
 
 ### 2. Configure
 ```bash
-cd /home/runner/workspace/doc-bot
-# Edit .env and add your token:
-echo "TELEGRAM_BOT_TOKEN=your_token_here" > .env
+git clone https://github.com/wizzleweasel/docbot.git
+cd docbot
+cp .env.example .env  # or edit .env directly
+```
+Paste your token in `.env`:
+```env
+TELEGRAM_BOT_TOKEN=your_token_here
 ```
 
 ### 3. Run
 ```bash
 ./start.sh
 ```
+Bot says: `✅ Connected as @your_docbot_bot`
 
 ### 4. Use It
-- Forward any message to your bot on Telegram
-- Bot replies with the filename
-- Files saved to `/home/runner/workspace/bot-docs/`
-- Tell **cumi**: *"check bot-docs/ for context about X"*
+- Forward any message to your bot
+- Bot replies: `✅ Saved as msg_20260503_193000_chat_sender.txt`
+- **Cumi (or any AI agent) can now read that file for context!**
 
 ---
 
-## 📄 File Format
+## 📁 How It Works
 
-Saved files look like:
+```
+User forwards message → docbot → saves as .txt in /bot-docs/
+                                  └─ Cumi reads file → better context recall
+```
+
+**File format:**
 ```
 === Message Metadata ===
 Timestamp: 2026-05-03T19:30:00
 Sender: John Doe @johndoe
 Chat: MyGroup (ID: -100123456)
-Message ID: 42
 === Forwarded From ===
 User: Alice @alice
 Original Date: 2026-05-01T10:00:00
@@ -65,43 +79,48 @@ Original Date: 2026-05-01T10:00:00
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Features
 
-- **Language:** Python 3
-- **Library:** pyTelegramBotAPI
-- **Storage:** Plain `.txt` files (no database needed)
-- **Hosting:** Runs on same system as cumi (Hermes Agent)
-
----
-
-## 🤖 Integration with cumi
-
-Once messages are saved, cumi can:
-```python
-# Search for relevant docs
-search_files(pattern="keyword", path="/home/runner/workspace/bot-docs")
-
-# Read specific file
-read_file("/home/runner/workspace/bot-docs/msg_20260503_193000.txt")
-```
+- ✅ **Saves forwarded messages** as searchable `.txt` files
+- ✅ **Metadata included** — sender, chat, timestamps, forward info
+- ✅ **Open access** — anyone can use it (no chat restrictions)
+- ✅ **AI-agent friendly** — Cumi can `read_file` or `search_files` to recall context
+- ✅ **Zero bloat** — no databases, no APIs, just files
+- ✅ **Lightweight** — runs on a potato
 
 ---
 
-## ⚠️ Caveats
+## 📦 Requirements
 
-- **Open access:** Bot accepts messages from any chat (set `ALLOWED_CHAT_IDS` in `.env` to restrict)
-- **No encryption:** Files saved as plain text
-- **No AI:** This bot just saves files, it doesn't understand them (that's cumi's job)
-
----
-
-## 📊 Stats
-
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.8+-green.svg)
-![Status](https://img.shields.io/badge/status-ready-success.svg)
+- Python 3.8+
+- `pyTelegramBotAPI` (auto-installed by `start.sh`)
+- A Telegram bot token from [@BotFather](https://t.me/BotFather)
 
 ---
 
-**Built for the [Hermes Agent](https://github.com/NousResearch/hermes-agent) ecosystem.**  
-*Part of the caveman/pierced-tongue/throw-rock family.* 🪨
+## 🤝 Part of the Hermes Ecosystem
+
+docbot is a **simple sidekick** in the Hermes multi-agent ecosystem:
+
+| Agent | Role | Model |
+|-------|------|-------|
+| **Cumi** | Main Hermes Agent (this chat) | tencent/hy3-preview:free |
+| **Pupu** | Nested Hermes Agent | tencent/hy3-preview:free |
+| **Kura** | Discord chatbot | tencent/hy3-preview:free |
+| **docbot** | Document support bot 🆕 | (no AI, just saves files) |
+
+---
+
+## 📜 License
+
+MIT — do whatever you want with it. Just don't blame me if it eats your messages.
+
+---
+
+## 🗿 Caveman Slogan
+
+> *"Me save. You read. Context good."*
+
+---
+
+**Built with ❤️ by [wizzleweasel](https://github.com/wizzleweasel) as part of the Hermes Ecosystem.**
